@@ -1,7 +1,9 @@
 -- Script simplificado para Tikitaka DB
 
--- TABLA: SELECCIONES DE FÚTBOL (teams)
+-- ELIMINAR TABLAS EN ORDEN CORRECTO (considerando foreign keys)
 DROP TABLE IF EXISTS user_sessions;
+DROP TABLE IF EXISTS comment_likes;
+DROP TABLE IF EXISTS comments;
 DROP TABLE IF EXISTS user_favorites;
 DROP TABLE IF EXISTS post_likes;
 DROP TABLE IF EXISTS posts;
@@ -89,6 +91,36 @@ CREATE TABLE user_favorites (
     UNIQUE KEY unique_user_favorite (user_id, post_id),
     INDEX idx_user_id (user_id),
     INDEX idx_post_id (post_id)
+);
+
+-- TABLA: COMENTARIOS
+CREATE TABLE comments (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    post_id INT NOT NULL,
+    user_id INT NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_post_id (post_id),
+    INDEX idx_user_id (user_id),
+    INDEX idx_created_at (created_at)
+);
+
+-- TABLA: LIKES DE COMENTARIOS
+CREATE TABLE comment_likes (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    comment_id INT NOT NULL,
+    user_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_user_comment (user_id, comment_id),
+    INDEX idx_comment_id (comment_id),
+    INDEX idx_user_id (user_id)
 );
 
 -- TABLA: SESIONES DE USUARIO (para autenticación)

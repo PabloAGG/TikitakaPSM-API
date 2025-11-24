@@ -10,7 +10,7 @@ const userRoutes = require('./routes/users');
 const postRoutes = require('./routes/posts');
 const teamRoutes = require('./routes/teams');
 const commentRoutes = require('./routes/comments');
-const notificationRoutes = require('./routes/notifications');
+// const notificationRoutes = require('./routes/notifications');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -61,7 +61,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/teams', teamRoutes);
 app.use('/api/comments', commentRoutes);
-app.use('/api/notifications', notificationRoutes);
+// app.use('/api/notifications', notificationRoutes);
 
 // Servir archivos estáticos (imágenes subidas)
 app.use('/uploads', express.static('uploads'));
