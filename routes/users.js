@@ -8,7 +8,8 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const router = express.Router();
-
+const dotenv = require('dotenv');
+dotenv.config();
 // Configuración de multer para subir imágenes de perfil
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -28,14 +29,35 @@ const upload = multer({
   storage: storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB límite
   fileFilter: (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|gif/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype);
+    console.log('Archivo recibido:', {
+      originalname: file.originalname,
+      mimetype: file.mimetype,
+      size: file.size
+    });
+    
+    // Tipos MIME permitidos para imágenes
+    const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif','image/*'];
+    
+    // Verificar extensión del archivo
+    const extname = path.extname(file.originalname).toLowerCase();
+    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
+    
+    console.log('Validación:', {
+      extname: extname,
+      isExtensionValid: allowedExtensions.includes(extname),
+      mimetype: file.mimetype,
+      isMimeTypeValid: allowedMimeTypes.includes(file.mimetype)
+    });
+    
+    const isMimeTypeValid = allowedMimeTypes.includes(file.mimetype);
+    const isExtensionValid = allowedExtensions.includes(extname);
 
-    if (mimetype && extname) {
+    if (isMimeTypeValid && isExtensionValid) {
       return cb(null, true);
     } else {
-      cb(new Error('Solo se permiten imágenes (jpeg, jpg, png, gif)'));
+      const errorMsg = `Tipo de archivo no permitido. Recibido: ${file.mimetype} (${extname})`;
+      console.error(errorMsg);
+      cb(new Error(errorMsg));
     }
   },
 });

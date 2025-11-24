@@ -28,15 +28,29 @@ const upload = multer({
   storage: storage,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB límite
   fileFilter: (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|gif|mp4|mov/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype) || file.mimetype.startsWith('video/');
-
-    if (mimetype && extname) {
-      return cb(null, true);
-    } else {
-      cb(new Error('Solo se permiten imágenes y videos'));
-    }
+     const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif','image/*'];
+        
+        // Verificar extensión del archivo
+        const extname = path.extname(file.originalname).toLowerCase();
+        const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
+        
+        console.log('Validación:', {
+          extname: extname,
+          isExtensionValid: allowedExtensions.includes(extname),
+          mimetype: file.mimetype,
+          isMimeTypeValid: allowedMimeTypes.includes(file.mimetype)
+        });
+        
+        const isMimeTypeValid = allowedMimeTypes.includes(file.mimetype);
+        const isExtensionValid = allowedExtensions.includes(extname);
+    
+        if (isMimeTypeValid && isExtensionValid) {
+          return cb(null, true);
+        } else {
+          const errorMsg = `Tipo de archivo no permitido. Recibido: ${file.mimetype} (${extname})`;
+          console.error(errorMsg);
+          cb(new Error(errorMsg));
+        }
   },
 });
 
